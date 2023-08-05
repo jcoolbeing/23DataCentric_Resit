@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Employee</title>
+  <style>
+    .eid-box {
+      border: 1px solid #000;
+      padding: 10px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <h1>Edit Employee</h1>
+  <div>
+    <label for="eid">EID:</label>
+    <input type="text" id="eid" name="eid" value="<%= employee.eid %>" disabled>
+  </div>
+  <div>
+<div>
+    <form action="/employees/edit/<%= employee.eid %>" method="post">
+        <div>
+          <label for="name">Name:</label>
+          <input type="text" id="name" name="name" value="<%= employee.ename %>" minlength="5" required>
+        </div>
+        <div>
+          <label for="role">Role:</label>
+          <select id="role" name="role" required>
+            <option value="Manager" <%= employee.role === 'Manager' ? 'selected' : '' %>>Manager</option>
+            <option value="Employee" <%= employee.role === 'Employee' ? 'selected' : '' %>>Employee</option>
+          </select>
+        </div>
+        <div>
+          <label for="salary">Salary:</label>
+          <input type="number" id="salary" name="salary" value="<%= employee.salary %>" min="1" required>
+        </div>
+        <button type="submit">Update</button>
+      </form>
+      <br>
+      <div>
+        <a href="/">Home</a>
+      </div>
+      
+
+</body>
+</html>

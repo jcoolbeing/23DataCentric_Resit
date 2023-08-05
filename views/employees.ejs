@@ -40,7 +40,7 @@
       <td><%= employee.role %></td>
       <td><%= employee.salary %></td>
       <td>
-        <form action="/employees/<%= employee.eid %>/update" method="GET">
+        <form action="/employees/edit/<%= employee.eid %>" method="GET">
           <button type="submit">Update</button>
         </form>
       </td>
