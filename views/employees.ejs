@@ -2,8 +2,50 @@
 <html>
 <head>
   <title>Employees Page</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    tr:hover {
+      background-color: #ddd;
+    }
+  </style>
 </head>
 <body>
-  <h1>Welcome to the Employees Page!</h1>
+  <h1>Employees</h1>
+  <table>
+    <tr>
+      <th>EID</th>
+      <th>Name</th>
+      <th>Role</th>
+      <th>Salary</th>
+      <th>Update</th>
+    </tr>
+    <% employees.forEach(employee => { %>
+    <tr>
+      <td><%= employee.eid %></td>
+      <td><%= employee.ename %></td>
+      <td><%= employee.role %></td>
+      <td><%= employee.salary %></td>
+      <td>
+        <form action="/employees/<%= employee.eid %>/update" method="GET">
+          <button type="submit">Update</button>
+        </form>
+      </td>
+    </tr>
+    <% }); %>
+  </table>
 </body>
 </html>

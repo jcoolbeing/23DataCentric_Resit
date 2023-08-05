@@ -30,14 +30,22 @@ app.get('/', (req, res) => {
 // Route Employees
 app.get('/employees', async (req, res) => {
   try {
-    // load data from database
-    const [rows, fields] = await req.app.locals.db.query('SELECT * FROM employee');
+    // Fetch all employees from the database
+    pool.query('SELECT * FROM employee', (err, results) => {
+      if (err) {
+        console.error('Error fetching employee data:', err);
+        return res.status(500).json({ error: 'An error occurred while fetching data.' });
+      }
 
-    // send response if not then send error
-    res.json(rows);
+      // checking if data is being accessed
+      console.log(results);
+
+      // send to view
+      res.render('employees', { employees: results });
+    });
   } catch (err) {
-    console.error('Error executing query:', err);
-    res.status(500).json({ error: 'An error occurred while fetching data.' });
+    console.error('Error rendering employees page:', err);
+    res.status(500).json({ error: 'An error occurred while rendering the page.' });
   }
 });
 
