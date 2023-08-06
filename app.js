@@ -103,10 +103,25 @@ pool.query(sql, values, (err, result) => {
   });
 });
 
+
 // Route Departments
 app.get('/departments', (req, res) => {
-  res.render('departments');
+  pool.query('SELECT * FROM dept', (err, results) => {
+    if (err) {
+      console.error('Error fetching data:', err);
+      return res.status(500).json({ error: 'Error fetching data.' });
+    }
+
+    // check to see if data is good
+    console.log(results);
+
+    // render in views folder
+    res.render('departments', { departments: results });
+  });
 });
+
+
+
 
 // Route Employees (MongoDB)
 app.get('/employees-mongodb', (req, res) => {
