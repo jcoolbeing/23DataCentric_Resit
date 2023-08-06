@@ -121,6 +121,33 @@ app.get('/departments', (req, res) => {
 });
 
 
+// Delete department
+app.post('/departments/delete/:did', (req, res) => {
+  const did = req.params.did;
+
+  // Check to see if the dept has employees
+  pool.query('SELECT * FROM emp_dept WHERE did = ?', [did], (err, results) => {
+    if (err) {
+      console.error('Error fetching data from emp_dept:', err);
+      return res.status(500).send('Error fetching data from emp_dept');
+    }
+    // if dept has emps
+    if (results.length > 0) {
+      return res.render('department-delete', { did: did });
+    }
+
+    // No emps found therefore deleting dept.
+    pool.query('DELETE FROM dept WHERE did = ?', [did], (err) => {
+      if (err) {
+        console.error('Error deleting department:', err);
+        return res.status(500).send('Error deleting department');
+      }
+
+      // Redirect to departments page
+      res.redirect('/departments');
+    });
+  });
+});
 
 
 // Route Employees (MongoDB)
