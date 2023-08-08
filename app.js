@@ -2,12 +2,19 @@ const express = require('express')
 const mysql = require('mysql2');
 const app = express()
 const port = 3000
+const empMongoData = require('./employeesDB.json');
+const {MongoClient} = require('mongodb');
+const uri = 'mongodb://localhost:27017';
+// name for db because i will make it so if it dosnt exist it will create the db
+const dbName = 'Proj2022';
+let db;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // setup ejs
 app.set('view engine', 'ejs');
 
+// MYSQL
 // connection pool
 const pool = mysql.createPool({
   connectionLimit: 12,
@@ -21,6 +28,44 @@ const pool = mysql.createPool({
 
 // accesable using locals.db
 app.locals.db = pool.promise();
+
+
+// MONGO_DB
+// Create database if it doesn't exist
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+client.connect()
+  .then(() => {
+    console.log('MongoDB connected');
+    db = client.db(dbName);
+    const collectionName = 'employees';
+
+    // was encountering a error because it was adding json each time app restarts
+    // so i chose this approach to make sure there are no duplicates
+    // Iterate through the JSON data
+    empMongoData.forEach((document) => {
+      // Check if the _id already exists
+      db.collection(collectionName).findOne({ _id: document._id }, (findErr, result) => {
+        if (findErr) {
+          console.error('Error finding document', findErr);
+          return;
+        }
+        if (!result) {
+          // If _id does not exist, insert the document
+          db.collection(collectionName).insertOne(document, (insertErr, result) => {
+            if (insertErr) {
+              console.error('Error inserting document', insertErr);
+            } else {
+              console.log('Document inserted:', document._id);
+            }
+          });
+        }
+      });
+    });
+  })
+  .catch(err => {
+    console.error('Could not connect to MongoDB', err);
+  });
 
 
 // $$$$$$$$$$$$$$$$$$ ROUTES $$$$$$$$$$$$$$
@@ -151,9 +196,19 @@ app.post('/departments/delete/:did', (req, res) => {
 
 
 // Route Employees (MongoDB)
-app.get('/employees-mongodb', (req, res) => {
-  res.render('employees-mongodb');
+app.get('/employees-mongodb', async (req, res) => {
+  try {
+    const collection = db.collection('employees');
+    const employees = await collection.find().toArray();
+    console.log(employees);
+    res.render('employees-mongodb', { employees });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Couldnt retrieve data');
+  }
 });
+
+
 
 // LISTENER
 app.listen(port, () => {

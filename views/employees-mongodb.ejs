@@ -1,9 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Employees (MongoDB) Page</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    tr:hover {
+      background-color: #ddd;
+    }
+  </style>
 </head>
 <body>
-  <h1>Welcome to the Employees (MongoDB) Page!</h1>
+  <h1>Employees (MongoDB)</h1>
+  <br>
+  <br>
+  <a href="">Add Employee (MongoDB)</a>
+  <br>
+  <br>
+  <table>
+    <tr>
+      <th>EID</th>
+      <th>Phone</th>
+      <th>Email</th>
+    </tr>
+    <% employees.forEach(employee => { %>
+    <tr>
+      <td><%= employee._id %></td>
+      <td><%= employee.phone %></td>
+      <td><%= employee.email %></td>
+    </tr>
+    <% }); %>
+  </table>
+  <div>
+    <a href="/">Home</a>
+  </div>
 </body>
 </html>
