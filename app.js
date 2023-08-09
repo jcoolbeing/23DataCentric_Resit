@@ -208,6 +208,31 @@ app.get('/employees-mongodb', async (req, res) => {
   }
 });
 
+// add employee route
+app.get('/add-employees-mongodb', (req, res) => {
+  res.render('add-employee-mongodb');
+});
+
+// post add employee route
+app.post('/add-employees-mongodb', (req, res) => {
+  if (!db) {
+    console.error('Database not connected');
+    return res.status(500).send('Database not connected');
+  }
+
+  const collection = db.collection('employees');
+  const { eid, phone, email } = req.body;
+
+  collection.insertOne({ _id: eid, phone, email }, (err, result) => {
+    if (err) {
+      console.error('Error inserting document', err);
+      return res.status(500).send('Error adding employee');
+    }
+
+    // redirect user back to mongo data
+    res.redirect('/employees-mongodb');
+  });
+});
 
 
 // LISTENER
