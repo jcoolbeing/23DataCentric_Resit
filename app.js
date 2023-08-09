@@ -214,7 +214,7 @@ app.get('/add-employees-mongodb', (req, res) => {
 });
 
 // post add employee route
-app.post('/add-employees-mongodb', (req, res) => {
+app.post('/add-employees-mongodb', async (req, res) => {
   if (!db) {
     console.error('Database not connected');
     return res.status(500).send('Database not connected');
@@ -223,13 +223,36 @@ app.post('/add-employees-mongodb', (req, res) => {
   const collection = db.collection('employees');
   const { eid, phone, email } = req.body;
 
+  // Validations
+  if (eid.length !== 4) {
+    return res.status(400).send('EID must be exactly 4 characters long.');
+  }
+  if (phone.length <= 5) {
+    return res.status(400).send('Phone must be more than 5 characters long.');
+  }
+  if (!/\S+@\S+\.\S+/.test(email)) {
+    return res.status(400).send('Please enter a valid email address.');
+  }
+
+  // Check if EID already exists in MongoDB
+  const existingEmployee = await collection.findOne({ _id: eid });
+  if (existingEmployee) {
+    return res.render('mongo-error', { message: `Error: ${eid} already exists.` });
+  }
+
+  // Check if EID exists in MySQL
+  const [mysqlEmployees] = await pool.promise().query('SELECT * FROM employee WHERE eid = ?', [eid]);
+  if (mysqlEmployees.length === 0) {
+    return res.render('mysql-error', { message: `Error: ${eid} doesn't exist in MYSQL DB.` });
+  }
+
   collection.insertOne({ _id: eid, phone, email }, (err, result) => {
     if (err) {
       console.error('Error inserting document', err);
       return res.status(500).send('Error adding employee');
     }
 
-    // redirect user back to mongo data
+    // Redirect user back to mongo data
     res.redirect('/employees-mongodb');
   });
 });
